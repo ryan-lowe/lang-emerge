@@ -144,25 +144,6 @@ class Dataloader:
 
         return batch, tasks, labels;
 
-    # get a batch from a large set of tasks
-    def getLargeBatch(self, batchSize):
-        # sample tasks
-        tasks = torch.LongTensor(batchSize).random_(0, self.numPairTasks - 1);
-        # sample a batch
-        indices = torch.LongTensor(batchSize).random_(0, self.numInst['train'] - 1);
-        if self.useGPU: indices = indices.cuda();
-        batch = self.data['train'][indices];
-
-        # now sample predictions based on task
-        selectInds = self.taskSelect[tasks];
-        if self.useGPU:
-            selectInds = selectInds.cuda();
-            tasks = tasks.cuda();
-        labels = batch.gather(1, selectInds);
-
-        return batch, tasks, labels;
-
-
     # get a batch
     def getBatchSpecial(self, batchSize, currentPred, negFraction=0.8):
         # sample tasks

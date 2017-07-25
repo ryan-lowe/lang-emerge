@@ -38,7 +38,7 @@ def read():
                             help='Maximum number of epochs to run')
     parser.add_argument('-learningRate', default=1e-3, type=float,\
                             help='Initial learning rate')
-    parser.add_argument('-useGPU', dest='useGPU', action='store_true')
+    parser.add_argument('-useGPU', dest='useGPU', default=False, action='store_true')
 
     try: parsed = vars(parser.parse_args());
     except IOError, msg: parser.error(str(msg));

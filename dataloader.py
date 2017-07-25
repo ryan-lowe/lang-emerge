@@ -43,7 +43,7 @@ class Dataloader:
         self.taskSelect = torch.LongTensor(self.taskDefn);
 
         # number of single and pair wise tasks
-        self.numPairTasks = 6;
+        self.numPairTasks = 12;
         self.numSingleTasks = 3;
 
         # create a vocab map for field values
@@ -83,15 +83,15 @@ class Dataloader:
     def saveDataset(self, savePath, trainSize=0.8):
         attributes = ['colors', 'shapes', 'styles'];
         # larger dataset
-        #props = {'colors': ['red', 'green', 'blue', 'purple', \
-        #                    'yellow', 'cyan', 'orange', 'teal'], \
-        #        'shapes': ['square', 'triangle', 'circle', 'star', \
-        #                    'heart', 'pentagon', 'hexagon', 'ring'],\
-        #       'styles': ['dotted', 'solid', 'filled', 'dashed', 'hstripe', \
-        #                   'vstripe', 'hgradient', 'vgradient']};
-        props = {'colors': ['red', 'green', 'blue', 'purple'],\
-                'shapes': ['square', 'triangle', 'circle', 'star'], \
-                'styles': ['dotted', 'solid', 'filled', 'dashed']};
+        props = {'colors': ['red', 'green', 'blue', 'purple', \
+                            'yellow', 'cyan', 'orange', 'teal'], \
+                'shapes': ['square', 'triangle', 'circle', 'star', \
+                            'heart', 'pentagon', 'hexagon', 'ring'],\
+               'styles': ['dotted', 'solid', 'filled', 'dashed', 'hstripe', \
+                           'vstripe', 'hgradient', 'vgradient']};
+        #props = {'colors': ['red', 'green', 'blue', 'purple'],\
+        #        'shapes': ['square', 'triangle', 'circle', 'star'], \
+        #        'styles': ['dotted', 'solid', 'filled', 'dashed']};
         attrList = [props[ii] for ii in attributes];
         dataVerbose = list(itertools.product(*attrList));
 
@@ -143,6 +143,25 @@ class Dataloader:
         labels = batch.gather(1, selectInds);
 
         return batch, tasks, labels;
+
+    # get a batch from a large set of tasks
+    def getLargeBatch(self, batchSize):
+        # sample tasks
+        tasks = torch.LongTensor(batchSize).random_(0, self.numPairTasks - 1);
+        # sample a batch
+        indices = torch.LongTensor(batchSize).random_(0, self.numInst['train'] - 1);
+        if self.useGPU: indices = indices.cuda();
+        batch = self.data['train'][indices];
+
+        # now sample predictions based on task
+        selectInds = self.taskSelect[tasks];
+        if self.useGPU:
+            selectInds = selectInds.cuda();
+            tasks = tasks.cuda();
+        labels = batch.gather(1, selectInds);
+
+        return batch, tasks, labels;
+
 
     # get a batch
     def getBatchSpecial(self, batchSize, currentPred, negFraction=0.8):

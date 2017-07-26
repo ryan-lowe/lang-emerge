@@ -43,7 +43,7 @@ class Dataloader:
         self.taskSelect = torch.LongTensor(self.taskDefn);
 
         # number of single and pair wise tasks
-        self.numPairTasks = 12;
+        self.numPairTasks = 6;
         self.numSingleTasks = 3;
 
         # create a vocab map for field values
@@ -110,6 +110,7 @@ class Dataloader:
         taskDefn = [[0, 1], [1, 0], [0, 2], \
                     [2, 0], [1, 2], [2, 1], \
                     [0, 0], [1, 1], [2, 2]];
+
 
         toSave = {'attributes':attributes, 'props':props, 'taskDefn':taskDefn,\
                     'numInst':numInst, 'split':splitData};
